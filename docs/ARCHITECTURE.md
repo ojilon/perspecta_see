@@ -94,7 +94,7 @@ No framework and no build step: nine plain scripts loaded in dependency order.
 | `inline-editor.js` | the editor inside the card: load, save, gutter, scope highlight |
 | `edges.js` | all SVG drawing: zones, lines, labels, badges, focus dimming |
 | `view.js` | pan/zoom/fit, dragging, click routing, legend |
-| `app.js` | boot, `rescan`, `render`, selection, search, HUD, keys |
+| `app.js` | boot, `rescan`, `render`, selection, search, HUD (incl. the clickable link list), empty state, keys |
 
 The canvas is one `<div id="world">` with a CSS transform. Cards are absolutely positioned
 inside it; the `<svg>` is *not* scaled — it receives world coordinates, which keeps the

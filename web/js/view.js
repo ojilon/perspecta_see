@@ -9,10 +9,40 @@
 const canvasEl = $("canvas");
 const worldEl = $("world");
 
+/* Where you were looking is worth remembering: coming back to a project and
+   landing on the same corner of the map saves a fit-and-hunt every time. */
+const VIEW_KEY = "perspecta.view.v1";
+
+function loadViews() {
+  try { return JSON.parse(localStorage.getItem(VIEW_KEY) || "{}") || {}; } catch (err) { return {}; }
+}
+
+function saveView() {
+  if (!G.root || !G.cards.size) return;
+  if (canvasEl.clientWidth < 200 || canvasEl.clientHeight < 150) return;
+  const all = loadViews();
+  all[G.root] = { x: Math.round(G.view.x), y: Math.round(G.view.y), k: Number(G.view.k.toFixed(3)) };
+  try { localStorage.setItem(VIEW_KEY, JSON.stringify(all)); } catch (err) { /* private mode */ }
+}
+
+const saveViewSoon = debounce(saveView, 500);
+
+/* Restore the remembered camera. Returns false if this project has none. */
+function restoreView() {
+  const v = loadViews()[G.root];
+  if (!v || !G.cards.size) return false;
+  G.view.x = v.x;
+  G.view.y = v.y;
+  G.view.k = clamp(v.k, 0.12, 2.6);
+  applyView();
+  return true;
+}
+
 function applyView() {
   const v = G.view;
   worldEl.style.transform = "translate(" + v.x + "px," + v.y + "px) scale(" + v.k + ")";
   $("zoomlabel").textContent = Math.round(v.k * 100) + "%";
+  saveViewSoon();
 }
 
 /* Zoom around a point given in canvas pixels. */
@@ -33,6 +63,7 @@ function fitView() {
   const b = mapBounds();
   if (!b) return;
   const W = canvasEl.clientWidth, H = canvasEl.clientHeight;
+  if (W < 200 || H < 150) return;          /* hidden/tiny window: do not save a nonsense zoom */
   const k = clamp(Math.min((W - 90) / (b.x1 - b.x0), (H - 90) / (b.y1 - b.y0)), 0.12, 1.15);
   G.view.k = k;
   G.view.x = (W - (b.x1 - b.x0) * k) / 2 - b.x0 * k;
@@ -73,6 +104,7 @@ function tidyLayout() {
   layoutCards();
   drawEdges();
   fitView();
+  saveView();
 }
 
 /* ---------- legend ---------- */

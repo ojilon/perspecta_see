@@ -75,8 +75,15 @@ folders and neighbours stay where they were.
 * **FILES** — the same files, linear, grouped by folder; folders collapse; the open file is
   highlighted. Click a row to open it in place and centre its card.
 * **HUD** (bottom left) — the scan summary `files · symbols · links · calls · ms`, and, on
-  selection, the function's name, file, scope and how many links go in and out. The red
-  `n dangling` pill expands the list; click an entry to jump to that line.
+  selection, the function's name, file, scope and how many links go in and out, followed by
+  a small **table of contents**: `calls → name (file:line)` and `used by ← name (file:line)`
+  as clickable chips. Clicking a chip walks to the other end (selects the function, or opens
+  the file at the line when the target is an id, a class or a route). Chasing a curve across
+  a zoomed-out map is guesswork; this is the same information as a list.
+  The red `n dangling` pill expands the unmatched references; click an entry to jump to
+  that line.
+* **Empty state** — scanning a folder with no `.c/.h/.js/.html/.css` files says so in the
+  middle of the canvas instead of showing an empty map. (See `showEmpty()` in `app.js`.)
 * **Legend** (bottom right) — only the kinds you can currently see, with their dash style.
 * **Search** (`/`) — dims every node that does not match a file path or function name.
   `Enter` jumps to the first match.
@@ -95,7 +102,11 @@ folders and neighbours stay where they were.
 | `f` / `t` / `+` `-` / `/` | fit · tidy · zoom · search |
 | `Ctrl+S` | save the open editor |
 
-Zoom, pan and card positions are pixel-accurate but not persisted across reloads (except
-card positions, which are). The map is intentionally not a graph auto-layout: columns by
-language plus remembered manual placement is predictable, and predictable beats clever when
-you are trying to find your way around someone else's project.
+**What is remembered** (`localStorage`, per project): dragged card positions
+(`perspecta.pos.v1`), the camera — pan and zoom (`perspecta.view.v1`) — and the last folder
+you scanned (`perspecta.root`). So reopening a project puts you back on the same corner of
+the map; **Fit** and **Tidy** overwrite the remembered camera on purpose.
+
+The map is intentionally not a graph auto-layout: columns by language plus remembered
+manual placement is predictable, and predictable beats clever when you are trying to find
+your way around someone else's project.

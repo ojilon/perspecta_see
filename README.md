@@ -39,9 +39,11 @@ Two drawing modes (top bar):
   dashed violet = cross file, dashed green = recursion.
 
 Click any function row to add *its* links on top, labelled `calls` / `used by`, with
-everything unrelated dimmed. The little panel bottom-left summarises the selection, and
-lists **dangling links** — references the parser could not match. That list is the most
-honest description of what the parser does and does not understand.
+everything unrelated dimmed. The panel bottom-left summarises the selection and lists its
+links as **clickable chips** (`→ drawCards (cards.js:109)`), so you can walk the graph
+without chasing curves. It also lists **dangling links** — references the parser could not
+match; that list is the most honest description of what the parser does and does not
+understand. Card positions and the camera are remembered per project.
 
 ## Editing from inside the map
 
@@ -64,6 +66,7 @@ honest description of what the parser does and does not understand.
 | `f` / `t` | fit everything / tidy (forget dragged positions) |
 | `/` | filter box: dims every node that does not match a path or function name |
 | `Esc` | clear the selection, then close the editor |
+| click a HUD chip | walk to the function / file on the other end of a link |
 | `+` `-` | zoom in / out |
 
 ## How it works (short version)

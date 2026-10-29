@@ -34,6 +34,7 @@ async function rescan(opts) {
   E.sym = null;
   E.dirty = false;
   render(data);
+  if (!restoreView()) fitView();          /* same corner of the map as last time */
   if (reopen && [...G.files.values()].some((f) => f.path === reopen)) {
     await openInline(reopen, null, { scroll, force: true, focus: false });
   }
@@ -61,10 +62,26 @@ function render(data) {
   HUD.clippedCalls = data.calls.length > MAX_CALL_LINES;
   buildCards(data);
   buildTree(data);
+  showEmpty(data);
   applyFilter();
   buildLegend();
   drawEdges();
   updateHud();
+}
+
+/* A scan that finds nothing is almost always a wrong folder, so say so instead
+   of showing an empty canvas. */
+function showEmpty(data) {
+  const old = document.querySelector("#canvas .empty");
+  if (old) old.remove();
+  if (data.files.length) return;
+  const box = make("div", "empty float");
+  box.append(make("b", "", "no source files in this folder"));
+  box.append(make("div", "", data.root || "(unknown)"));
+  box.append(make("div", "hint",
+    "perspecta_see reads .c .h .js .mjs .html .htm .css — point the project box at a " +
+    "folder that contains them, then press Scan."));
+  $("canvas").append(box);
 }
 
 /* ---------- selection ---------- */
@@ -150,6 +167,7 @@ function updateHud(hits) {
     if (HUD.clippedCalls && G.mode === "calls") row.append(pill("showing first " + MAX_CALL_LINES + " calls"));
   }
   hud.append(row);
+  if (G.selSym !== null) hud.append(linkList(G.selSym));
 
   if (HUD.showDangling && G.selSym === null && d.unresolved.length) {
     const list = make("div", "dangling");
@@ -173,6 +191,61 @@ function updateHud(hits) {
   }
 }
 
+/* The links of one symbol as a list you can walk: click a chip to jump to the
+   thing on the other end. At low zoom the canvas lines are pretty but hard to
+   follow; this is the same information as a table of contents. */
+function linkList(id) {
+  const box = make("div", "links");
+  const out = G.data.calls.filter((l) => l.from === id);
+  const inn = G.data.calls.filter((l) => l.to === id);
+  const CAP = 10;
+
+  const line = (title, list, arrow, cls) => {
+    const row = make("div", "link-row");
+    row.append(make("span", "lk " + cls, title));
+    if (!list.length) {
+      row.append(make("span", "none", "—"));
+    } else {
+      list.slice(0, CAP).forEach((l) => {
+        const target = G.syms.get(arrow === "→" ? l.to : l.from);
+        if (!target) return;
+        const f = G.files.get(target.file);
+        const chip = make("span", "chip");
+        chip.append(make("span", "arrow", arrow),
+                    document.createTextNode(target.name),
+                    make("span", "where", f ? basename(f.path) + ":" + target.line : "?"));
+        chip.title = (f ? f.path : "?") + ":" + target.line + "  (" + l.kind + ")";
+        chip.onclick = () => followSym(target.id);
+        row.append(chip);
+      });
+      if (list.length > CAP) row.append(make("span", "none", "+" + (list.length - CAP) + " more"));
+    }
+    return row;
+  };
+
+  box.append(line("calls", out, "→", "out"));
+  box.append(line("used by", inn, "←", "in"));
+  return box;
+}
+
+/* Walk to a symbol: select it, bring its card into view, and if it is not a
+   function (an html id, a css class, a route) open the file at that line. */
+function followSym(id) {
+  const s = G.syms.get(id);
+  if (!s) return;
+  const f = G.files.get(s.file);
+  const card = f ? G.cards.get(f.id) : null;
+  if (s.kind === "func") {
+    G.selSym = id;
+    drawEdges();
+    updateHud();
+    if (card) ensureVisible(card);
+  } else if (f) {
+    if (card) ensureVisible(card);
+    openInline(f.path, s);
+  }
+}
+
 /* ---------- top bar + keyboard ---------- */
 function setMode(mode) {
   G.mode = mode;
@@ -187,8 +260,7 @@ function wireTopbar() {
   $("scan").onclick = async () => {
     if (E.dirty && !confirm("Re-scanning reloads the open file and drops unsaved changes. Continue?")) return;
     try {
-      await rescan();
-      fitView();
+      await rescan();                 /* rescan restores or fits the camera */
     } catch (err) { /* rescan already reported it */ }
   };
   $("root").addEventListener("keydown", (e) => {
@@ -246,7 +318,6 @@ async function boot() {
     const remembered = typeof lastRoot === "function" ? lastRoot() : "";
     $("root").value = remembered || p.root || p.cwd;
     await rescan();
-    fitView();
   } catch (err) {
     setStatus("Cannot reach the C server: " + err.message, true);
   }
