@@ -1,3 +1,4 @@
+/* buf.c — the growable string buffer. Keep it boring: append, appendf, escape. */
 #include "buf.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -60,20 +61,4 @@ void buf_json_str(Buf *b, const char *s) {
         }
     }
     buf_addn(b, "\"", 1);
-}
-
-char *file_read_all(const char *path, size_t *n, size_t max_bytes) {
-    FILE *fp = fopen(path, "rb");
-    if (!fp) return NULL;
-    fseek(fp, 0, SEEK_END);
-    long sz = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    if (sz < 0 || (size_t)sz > max_bytes) { fclose(fp); return NULL; }
-    char *b = (char *)malloc((size_t)sz + 1);
-    if (!b) { fclose(fp); return NULL; }
-    size_t r = fread(b, 1, (size_t)sz, fp);
-    fclose(fp);
-    b[r] = 0;
-    if (n) *n = r;
-    return b;
 }

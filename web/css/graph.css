@@ -1,0 +1,51 @@
+/* graph.css — the drawing itself: folder zones, link lines, badges.
+ *
+ * Lines are drawn in one <svg> that sits under the cards, so a link can leave
+ * a function row and land on another row without either card knowing about it.
+ * Colours and dash patterns come from web/js/state.js (LINK[...]); only the
+ * shared geometry lives here.
+ */
+
+/* dashed rectangle around the cards of one folder */
+.zone { fill: rgba(73, 168, 255, .035); stroke: #2a5aa0; stroke-dasharray: 7 6; }
+.zone-label {
+  fill: var(--muted-2);
+  font-size: 11px;
+  letter-spacing: .04em;
+  text-transform: none;
+  font-family: var(--mono);
+}
+
+.edge {
+  fill: none;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  opacity: .92;
+  transition: opacity .15s;
+}
+.edge.faded { opacity: .12; }
+.edge.hot { stroke-width: 2.6; opacity: 1; }
+.edge.loop { stroke-width: 2.2; }
+
+/* the little ×n pill on aggregated file links */
+.badge-bg { fill: #0a1f3d; stroke: #2b5fa8; }
+.badge-text {
+  fill: var(--text);
+  font-size: 10.5px;
+  font-family: var(--mono);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* a label sitting on a link, e.g. "calls" / "used by" */
+.edge-label-bg { fill: #0b1d3a; stroke: #2b5fa8; opacity: .96; }
+.edge-label {
+  fill: #cfe2ff;
+  font-size: 10px;
+  font-family: var(--mono);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* junction dot where several links meet a card edge */
+.junction { fill: #0a1f3d; stroke-width: 2; }

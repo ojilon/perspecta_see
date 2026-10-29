@@ -1,0 +1,104 @@
+/* base.css — design tokens, reset and the small pieces every panel shares.
+ *
+ * The look follows the concept art: deep navy background, softly lit panels,
+ * one accent blue for "this is interactive" and one green for "this works".
+ * Everything else is a neutral so the coloured link lines stay the loudest
+ * thing on screen.
+ */
+
+:root {
+  --bg: #061224;
+  --bg-glow: #0b1f3d;
+  --panel: rgba(9, 25, 48, .88);
+  --panel-solid: #0b1d3a;
+  --card: #0d2244;
+  --card-head: #11294f;
+  --card-hover: #14325f;
+  --line: #1d3d70;
+  --line-soft: #16325c;
+  --text: #dbe7ff;
+  --muted: #7e97c0;
+  --muted-2: #5b7398;
+  --accent: #49a8ff;
+  --accent-soft: rgba(73, 168, 255, .16);
+  --ok: #4be3a0;
+  --warn: #ff6b7a;
+  --mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+  --radius: 10px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, .38);
+  --code-lh: 18px;      /* the inline editor relies on this exact value */
+  --code-fs: 12.5px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; margin: 0; }
+
+body {
+  background:
+    radial-gradient(1200px 600px at 15% -10%, #0e2a53 0%, transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, #0a2246 0%, transparent 55%),
+    var(--bg);
+  color: var(--text);
+  font: 13.5px/1.45 system-ui, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+::selection { background: rgba(73, 168, 255, .35); }
+
+button {
+  background: #12305f;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 5px 11px;
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, color .12s;
+}
+button:disabled { opacity: .5; cursor: default; }
+button:hover { background: #1a4285; border-color: #2c5da8; }
+button:active { background: #17529b; }
+button.primary {
+  background: linear-gradient(180deg, #2f8ef0, #2477d4);
+  border-color: #3a97f5;
+  color: #04182e;
+  font-weight: 650;
+}
+button.primary:hover { background: linear-gradient(180deg, #49a8ff, #2a86e6); }
+button.mini { padding: 2px 8px; font-size: 11.5px; border-radius: 6px; }
+button.ghost { background: transparent; }
+button.ghost:hover { background: #16325c; }
+
+input {
+  background: #081a33;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 5px 9px;
+  font: inherit;
+  font-size: 12.5px;
+  outline: none;
+}
+input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+input::placeholder { color: var(--muted-2); }
+
+/* floating panels: legend + hud sit on top of the canvas but never block it */
+.float {
+  position: absolute;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow);
+  font-size: 12px;
+}
+
+/* scrollbars: thin and dark, like the rest of the app */
+* { scrollbar-width: thin; scrollbar-color: #22457a transparent; }
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-thumb { background: #22457a; border-radius: 5px; }
+*::-webkit-scrollbar-track { background: transparent; }

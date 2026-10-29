@@ -1,6 +1,7 @@
 /* server.c: a tiny HTTP server (one request at a time, localhost only).
    The browser talks HTTP, C answers. That is the whole "bridge". */
 #include "server.h"
+#include "fs.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +13,7 @@ typedef SOCKET sock_t;
 #define SOCK_CLOSE closesocket
 #define SEND_FLAGS 0
 #else
+#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <signal.h>
 #include <sys/socket.h>
@@ -176,7 +178,7 @@ static void serve_static(sock_t c, const char *web, const char *path) {
 }
 
 /* ---------- main loop ---------- */
-int server_run(int port, const char *web, ApiHandler api) {
+int server_run(int port, const char *host, const char *web, ApiHandler api) {
 #ifdef _WIN32
     WSADATA w;
     if (WSAStartup(MAKEWORD(2, 2), &w)) { fprintf(stderr, "WSAStartup failed\n"); return 1; }
@@ -193,12 +195,20 @@ int server_run(int port, const char *web, ApiHandler api) {
     memset(&a, 0, sizeof a);
     a.sin_family = AF_INET;
     a.sin_port = htons((unsigned short)port);
-    a.sin_addr.s_addr = htonl(INADDR_LOOPBACK);          /* 127.0.0.1 only: not reachable from the network */
+    if (!host || !host[0] || !strcmp(host, "localhost")) a.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    else {
+        a.sin_addr.s_addr = inet_addr(host);              /* "0.0.0.0" = any interface */
+        if (a.sin_addr.s_addr == INADDR_NONE) {
+            fprintf(stderr, "bad --host '%s' (try 127.0.0.1 or 0.0.0.0)\n", host);
+            return 1;
+        }
+    }
     if (bind(s, (struct sockaddr *)&a, sizeof a) != 0 || listen(s, 16) != 0) {
         fprintf(stderr, "cannot listen on port %d (already running?)\n", port);
         return 1;
     }
-    printf("perspecta_see: http://127.0.0.1:%d   (Ctrl+C to stop)\n", port);
+    printf("perspecta_see: http://%s:%d   (Ctrl+C to stop)\n",
+           (!host || !host[0] || !strcmp(host, "localhost")) ? "127.0.0.1" : host, port);
     fflush(stdout);
 
     for (;;) {
