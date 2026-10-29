@@ -1,6 +1,7 @@
 # perspecta_see — build with any C99 compiler.
 #
 #   make            build ./perspecta_see
+#   make test       end-to-end checks (tests/run.sh)
 #   make run        build and serve on http://127.0.0.1:8787
 #   make demo       build and serve on 0.0.0.0 (sandbox / container previews)
 #   make clean
@@ -35,4 +36,7 @@ demo: $(BIN)
 clean:
 	rm -f $(OBJ) $(BIN) perspecta_see.exe
 
-.PHONY: all run demo clean
+.PHONY: all run demo test clean
+
+test: $(BIN)
+	sh tests/run.sh

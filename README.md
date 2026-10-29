@@ -11,6 +11,7 @@ place. The first project this tool is tested on is its own source.
 ```
 .\build.ps1 -Run                  # Windows (PowerShell)
 make run                          # macOS / Linux   ->  http://127.0.0.1:8787
+make test                         # 19 end-to-end checks against tests/fixture
 ```
 
 Then type the folder you want to look at (or leave it: it starts on the folder the server
@@ -101,6 +102,7 @@ src/         one .c per header, plus main.c
 web/index.html
 web/css/     base (tokens) · layout (frame) · graph (lines) · cards (nodes + editor)
 web/js/      util · api · state · tree · cards · inline-editor · edges · view · app
+tests/       run.sh + check.py: build, scan the fixture, exercise the API
 docs/        architecture, parser notes, UI legend, roadmap
 image_concepts/  the concept art this UI follows
 Makefile     POSIX build        build.ps1   Windows build
@@ -120,3 +122,12 @@ Makefile     POSIX build        build.ps1   Windows build
   diff in git the first time you edit it there.
 * **Fixed tables.** Up to 1500 files, 12000 symbols, 20000 references; past that the scan
   stops recording rather than failing.
+
+## Tests
+
+`make test` (or `sh tests/run.sh`) copies `tests/fixture/` to a temp folder, starts the
+server, and asserts the promises this README makes: comments never become routes, `$()` and
+`getElementById()` do become DOM links, inline `<script>`/`<style>` are parsed with exact
+line numbers, function scopes end where their body ends, a cross-file call to an inline
+function resolves, save/reload round-trips, and the path guard rejects everything outside
+the scanned folder. 19 checks, a couple of seconds, no dependencies beyond `python3`.

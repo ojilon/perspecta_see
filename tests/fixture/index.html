@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>fixture</title>
+  <link rel="stylesheet" href="css/site.css">
+  <!-- An inline stylesheet: .card must be found in *this* file. -->
+  <style>
+    .card { border: 1px solid #000; }
+  </style>
+</head>
+<body>
+  <div id="app" class="panel card"></div>
+
+  <script src="js/main.js"></script>
+
+  <!-- An inline script: inlineHello() must be found, and a call from
+       js/main.js must be able to reach it. -->
+  <script>
+    function inlineHello() {
+      return "hi";
+    }
+  </script>
+</body>
+</html>

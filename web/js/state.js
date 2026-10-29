@@ -60,7 +60,6 @@ const E = {
   card: null,              /* its card record */
   sym: null,               /* function we jumped to, if any */
   dirty: false,
-  scroll: 0,               /* kept across a rescan so saving does not jump */
 };
 
 /* ---------- remembering dragged cards ---------- */

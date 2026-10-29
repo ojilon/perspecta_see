@@ -56,9 +56,3 @@ function debounce(fn, ms) {
     t = setTimeout(() => fn(...args), ms);
   };
 }
-
-/* A file id -> "web/js/app.js"-style label, used in tooltips and the hud. */
-function filePath(id) {
-  const f = G.files.get(id);
-  return f ? f.path : "?";
-}
