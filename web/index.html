@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>perspecta_see</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="topbar">
+    <strong id="brand">perspecta_see</strong>
+    <label>Project folder
+      <input id="root" type="text" spellcheck="false" placeholder="D:/projects/my_project">
+    </label>
+    <button id="scan">Scan</button>
+    <span id="status"></span>
+    <span class="spacer"></span>
+    <div id="legend"></div>
+    <button id="fit">Fit</button>
+    <span id="zoomlabel">100%</span>
+  </header>
+
+  <main>
+    <aside id="tree"></aside>
+    <section id="canvas">
+      <div id="world">
+        <svg id="lines"></svg>
+        <div id="cards"></div>
+      </div>
+    </section>
+    <aside id="editor" hidden>
+      <div id="editor-bar">
+        <span id="editor-path"></span>
+        <button id="save">Save (Ctrl+S)</button>
+        <button id="close" title="Close">&times;</button>
+      </div>
+      <textarea id="editor-text" spellcheck="false"></textarea>
+    </aside>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/graph.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

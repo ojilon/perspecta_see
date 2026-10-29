@@ -1,0 +1,11 @@
+perspecta_see.exe
+perspecta_see
+*.o
+.zig-cache/
+zig-out/
+
+#executables
+*.exe
+
+#clangd
+.clangd
