@@ -16,6 +16,11 @@ void Unpack_for_file_properties(FileInfo *self, const char *path) {
     self->file_size = 0;
 }
 
+
+//-------------------------------------------------
+// ENTRY POINT
+// ------------------------------------------------
+
 int main(int argc, char *argv[]) {
     //file object
     FileInfo Target_file;
