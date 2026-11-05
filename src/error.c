@@ -1,5 +1,4 @@
 #include "error.h"
-#include "errno.h"
 #include <stdio.h>
 
 Error error_make(ErrorCode code, const char *message, const char *file, int line){
