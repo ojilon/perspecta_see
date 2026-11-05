@@ -1,6 +1,5 @@
 # build output
-perspecta_see.exe
-perspecta_see
+*.exe
 *.o
 *.obj
 build/
