@@ -8,15 +8,15 @@ typedef struct{
 }FileInfo;
 
 int main(int argc, char *argv[]) {
-    //path to the file
+    //file object
     FileInfo FileObject = {0};
-    
+
     if(argc < 2) {
         printf("Usage: .\\perspecta.exe <path_to_file.c> ");
         return 1;
-    }    
+    }
 
     printf("Path to file: %s\n", argv[1]);
     return 0;
-    
+
 }
