@@ -15,6 +15,7 @@ typedef enum {
 typedef struct {
     ErrorCode code;
     const char *message; /*musr be s string literal */
+    int system_code;
     const char *file; /*filed by macro */
     int line; /*filled by macro*/
 } Error;
