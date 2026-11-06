@@ -1,5 +1,6 @@
 #include "error.h"
 #include <stdio.h>
+#include <stdio.h>
 #include <string.h>
 
 #define MAX_PATH_LENGTH 260
@@ -10,22 +11,14 @@ typedef struct{
     long file_size;
 }FileInfo;
 
-Error Unpack_for_file_properties(FileInfo *self, const char *path) {
 
-    if(self == NULL || path == NULL){
-        return ERROR(ERR_INVALID_ARGUMENT, "NULL argument");
-    }
+//-------------------------
+//function declarations
+//-----------------------------------
+Error Unpack_for_file_properties(FileInfo *self, const char *path);
+Error Count_lines(FileInfo *self);
 
-    if (strlen(path) >= MAX_PATH_LENGTH) {
-        return ERROR(ERR_INVALID_ARGUMENT,"Path is too long");    
-    }
-    
-    strcpy(self->file_path, path);
-    self->line_count = 0;
-    self->file_size = 0;
 
-    return ERROR_OK;
-}
 
 
 //-------------------------------------------------
@@ -48,9 +41,82 @@ int main(int argc, char *argv[]) {
         return 1;    
     }
 
-    printf("Path to file: %s\n", Target_file.file_path);
-    printf("Line count: %d\n", Target_file.line_count );
+    //count lines
+    err = Count_lines(&Target_file);
+    if(!error_is_ok(&err)) {
+        error_print(&err);
+        return 1;
+    }
+
+    printf("Path: %s\n", Target_file.file_path);
+    printf("Size: %ld\n", Target_file.file_size);
+    printf("line cout: %d\n", Target_file.line_count);
     
     return 0;
 
+}
+
+
+//---------------------------------
+// FUNCTION IMPLEMENTATIONS
+// ---------------------------------
+Error Unpack_for_file_properties(FileInfo *self, const char *path) {
+
+    if(self == NULL || path == NULL){
+        return ERROR(ERR_INVALID_ARGUMENT, "NULL argument");
+    }
+
+    if (strlen(path) >= MAX_PATH_LENGTH) {
+        return ERROR(ERR_INVALID_ARGUMENT,"Path is too long");    
+    }
+    
+    strcpy(self->file_path, path);
+    self->line_count = 0;
+    self->file_size = 0;
+
+    return ERROR_OK;
+}
+
+Error Count_lines(FileInfo *self){
+    Error err = ERROR_OK;
+    FILE *file = NULL;
+
+    int ch;
+    int last = '\n'; /*an empty file counts as 0 lines */
+    int lines = 0;
+    long size = 0;
+
+    //still an unclear error, should be able to later show what more
+    // information about the error concerning what the function received
+    if (self == NULL) {
+        return ERROR(ERR_INVALID_ARGUMENT, "NULL FileInfo");    
+    }
+
+    file = fopen(self->file_path, "rb");
+    if (file == NULL) {
+        err = ERROR(ERR_FILE_OPEN, "Coud not open file");
+        goto cleanup;    
+    }
+
+    //count the number of lines in the file
+    while ((ch = fgetc(file)) != EOF) {
+        size++;
+        if(ch == '\n') lines++;
+        last = ch;    
+    }
+    
+    if (ferror(file)) {
+        err = ERROR(ERR_FILE_READ, "Error while reading file");
+        goto cleanup;    
+    }
+
+    if (last != '\n') lines++; /*last line had no trailing new line */
+    
+    /*only write results once everything succeeds */
+    self->line_count = lines;
+    self->file_size = size;    
+
+    cleanup:
+       if(file != NULL) fclose(file);
+       return err;    
 }
