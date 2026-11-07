@@ -4,6 +4,14 @@ Finish the error and file APIs (open, close, read whole, read chunks), add
 integer typedefs, a tiny build script, and small test programs. By the end,
 `main.c` uses the `File` API instead of raw `fopen`.
 
+> **Status note (current branch):** Session 12 is already done — `Count_lines`
+> opens and closes via `File_open` / `File_close` and reads from the handle.
+> Prefer the safer, chunk-first order in
+> [suggestions-phase1.md](suggestions-phase1.md) and the constraints in
+> [practical-addendum.md](practical-addendum.md). The original whole-file
+> sketches below are incomplete shapes (unchecked seek/alloc/read); treat them
+> as illustrations, not safe code to run as written.
+
 ## Goal
 A small, reliable base layer: open a file through a handle, read it whole or in
 chunks, report errors with `errno` reasons, and build everything with one
@@ -17,7 +25,8 @@ pointers.
 
 ## Prerequisites
 - Phase 0 (current code): `error.h/error.c`, `file.h/file.c` (open/close),
-  `main.c` (FileInfo, prints path/size/lines) compile and run.
+  `main.c` (FileInfo, prints path/size/lines) compile and run. `Count_lines`
+  already uses the `File` API.
 
 ## Sessions
 
@@ -83,6 +92,10 @@ fread(*out_bytes, 1, (usize)size, self->handle);
 ```
 **Expected result.** `build.bat` compiles; no function calls it yet.
 **Stop here.** Compiles clean. Allocation failure handling comes in session 6.
+**Safety note.** Prefer implementing and testing `File_read_chunk` first (see
+suggestions). If you keep seek/tell, restrict to seekable files and check every
+result; handle empty files, allocation failure, and partial reads before any
+demo uses this API.
 
 ### Session 5 — visible result: dump a file's bytes ([hand-written])
 **Goal.** Call `File_read_whole` from `main.c` and print bytes read.
@@ -129,7 +142,8 @@ if (ferror(self->handle)) {
 }
 ```
 **Expected result.** Compiles; unused until session 9.
-**Stop here.** Compiles clean.
+**Stop here.** Compiles clean. Put the saved `errno` into the error's
+`system_code` when returning.
 
 ### Session 9 — visible result: chunked dump ([hand-written])
 **Goal.** Read `src\main.c` in 16-byte chunks and print each chunk's size.
@@ -165,6 +179,8 @@ while (true) {
 **Expected result.** `perspecta.exe src\main.c` prints identical path/size/line count, now through the `File` API.
 **Stop here.** Output identical to before; raw `fopen` removed from `main.c`.
 
+> **Already done on this branch.** Skip or mark complete in your session log.
+
 ### Session 13 — first test program ([hand-written])
 **Goal.** A small program that checks `File_read_whole` on a known file.
 **Shape shown first.** `tests/file_read_test.c` with a `main` that opens `src\error.h`, reads whole, asserts size > 0, prints PASS/FAIL.
@@ -187,21 +203,25 @@ while (true) {
 
 ## Deliverable
 `perspecta.exe` built by `build.bat`/`build.sh`; `main.c` prints path, size, line
-count using `File_open`/`File_close`/`File_read_whole`; `tests/` holds one small
-test program; integer typedefs in `src/types.h`.
+count using `File_open`/`File_close` (and preferably a safe read path); `tests/`
+holds one small test program; integer typedefs in `src/types.h`.
 
 ## Definition of done
 - [ ] `src/types.h` with i8/u8/u16/i32/u32/i64/u64/usize/f32/f64
 - [ ] `build.bat` and `build.sh` compile everything with one command
 - [ ] `File_read_whole` and `File_read_chunk` implemented and tested
-- [ ] `main.c` uses the `File` API (no raw `fopen`)
+- [ ] `main.c` uses the `File` API (no raw `fopen`) — **done**
 - [ ] One test program in `tests/` passes
 - [ ] Clean build with `-Wall -Wextra -Wpedantic`
 - [ ] Session logs written for every session
 
+See also the refined checklist in [suggestions-phase1.md](suggestions-phase1.md).
+
 ## What to read
 - `docs/guides/code-style.md` (naming and ownership rules) — before Phase 2.
 - `docs/guides/error-handling.md` — Option A conventions used above.
+- `docs/journey/suggestions-phase1.md` — safer order given the current baseline.
+- `docs/journey/practical-addendum.md` — constraints and research loop.
 
 ## Buffer
 One buffer week sits between Phase 1 and Phase 2. Use it for exams, power cuts,

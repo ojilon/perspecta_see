@@ -15,11 +15,24 @@ moving on a Celeron PC with Termux on Android, through exams and power cuts.
 - `src/error.h`, `src/error.c` — `Error` struct, `ERROR`/`ERROR_OK` macros,
   `error_print`. Done.
 - `src/file.h`, `src/file.c` — `File` handle wrapping `FILE*`, `File_open`,
-  `File_close`. Reading whole files and reading in chunks comes in Phase 1.
-- `src/main.c` — takes a path, prints path, size, line count. It still opens
-  files with raw `fopen`; Phase 1 moves it onto the `File` API.
+  `File_close`. Chunk and whole-file reads come in Phase 1.
+- `src/main.c` — takes a path, prints path, size, line count. `Count_lines`
+  already uses `File_open` / `File_close` and reads via the handle; the next
+  work is safer lifecycle contracts and chunk-based reading (see suggestions).
 
-Nothing in `docs/` changes the C code. The plan describes what to write next.
+Nothing in `docs/` changes the C code by itself. The plan describes what to
+write next.
+
+## Practical companions
+
+- [practical-addendum.md](practical-addendum.md) — safer interpretation of the
+  foundation, research-oriented capabilities, and realistic year pacing.
+- [suggestions-phase1.md](suggestions-phase1.md) — recommended Phase 1 session
+  order given the current baseline (Session 12 already done).
+
+Where a specific example or checkpoint conflicts with an older phase file, use
+the addendum and suggestions as the safer reading; update the phase files when
+you choose.
 
 ## The phases
 
@@ -44,11 +57,13 @@ it does not break. Re-read your last session log and continue.
 ## How to use these docs
 
 1. Pick the current phase file (start with `phase-01-foundation-i.md`).
-2. Do one numbered session per sitting. Sessions are sized for 20–30 minutes;
+2. Prefer the [Phase 1 suggestions](suggestions-phase1.md) order while the
+   foundation is still settling; they align with the practical addendum.
+3. Do one numbered session per sitting. Sessions are sized for 20–30 minutes;
    on 15-minute days do half a session and stop at a compiling state.
-3. Every session must end compiling, with one small, visible result.
-4. Log the session in `docs/journey/sessions/` (see SESSION_TEMPLATE.md).
-5. When a phase's definition of done is met, move to the next phase.
+4. Every session must end compiling, with one small, visible result.
+5. Log the session in `docs/journey/sessions/` (see SESSION_TEMPLATE.md).
+6. When a phase's definition of done is met, move to the next phase.
 
 ## Rules of the journey
 
@@ -80,7 +95,9 @@ it does not break. Re-read your last session log and continue.
 
 ## What to read next
 
-- `docs/journey/phase-01-foundation-i.md` — start here.
+- `docs/journey/phase-01-foundation-i.md` — original Phase 1 sessions.
+- `docs/journey/suggestions-phase1.md` — safer order given current code.
+- `docs/journey/practical-addendum.md` — constraints, research loop, side quests.
 - `docs/guides/code-style.md` — naming, headers, ownership before writing much
   new code.
 - `docs/guides/error-handling.md` — how errors flow through the code.
