@@ -9,6 +9,11 @@ Error File_open(File *self, const char *path, const char *mode){
         return ERROR(ERR_INVALID_ARGUMENT, "invalide arguments");
     }
 
+    //make sure is empty
+    self->handle = NULL;
+    self->path = NULL;
+    self->is_open = false;
+
     FILE *h = fopen(path, mode);
     if(h == NULL) {
         int saved = errno;
