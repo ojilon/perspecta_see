@@ -9,7 +9,8 @@ typedef enum {
     ERR_INVALID_ARGUMENT,
     ERR_FILE_OPEN,
     ERR_FILE_READ,
-    ERR_INTERNAL
+    ERR_INTERNAL,
+    ERR_FILE_CLOSE,
 } ErrorCode;
 
 typedef struct {

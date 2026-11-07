@@ -28,3 +28,27 @@ Error File_open(File *self, const char *path, const char *mode){
 
     return  ERROR_OK;
 }
+
+Error File_close(File *self){
+    if (self == NULL) {
+        return ERROR(ERR_INVALID_ARGUMENT, "Invalid FIle");    
+    }
+
+    if(!self->is_open){
+        return ERROR_OK;
+    }
+
+    if (fclose(self->handle) != 0) {
+        self->handle = NULL;
+        self->path=NULL;
+        self->is_open=false;
+
+        return ERROR(ERR_FILE_CLOSE, "Could not close file");
+    }
+
+    self->handle = NULL;
+    self->path=NULL;
+    self->is_open=false;
+
+    return ERROR_OK;
+}
