@@ -34,16 +34,23 @@ Error File_close(File *self){
         return ERROR(ERR_INVALID_ARGUMENT, "Invalid FIle");    
     }
 
-    if(!self->is_open){
+    //already closed
+    if(!self->is_open || self->handle == NULL){
         return ERROR_OK;
     }
 
     if (fclose(self->handle) != 0) {
+        int saved_errno = errno;
+
+        //even on failure, clear fields to avoid double-free/double-close
         self->handle = NULL;
         self->path=NULL;
         self->is_open=false;
 
-        return ERROR(ERR_FILE_CLOSE, "Could not close file");
+        Error err = ERROR(ERR_FILE_CLOSE, "Could not close file");
+        err.system_code = saved_errno;
+
+        return err;
     }
 
     self->handle = NULL;

@@ -83,6 +83,7 @@ Error Unpack_for_file_properties(FileInfo *self, const char *path) {
 //Count the number of lines in the file
 Error Count_lines(FileInfo *self){
     Error err = ERROR_OK;
+    Error close_err = ERROR_OK;
     
     int ch;
     int last = '\n'; /*an empty file counts as 0 lines */
@@ -100,8 +101,6 @@ Error Count_lines(FileInfo *self){
     
     err = File_open(&fileobject, self->file_path, "rb");
     if (!error_is_ok(&err)) {
-        int saved = errno;
-        err.system_code = saved;
         goto cleanup;    
     }
 
@@ -113,7 +112,9 @@ Error Count_lines(FileInfo *self){
     }
     
     if (ferror(fileobject.handle)) {
+        int saved_errno = errno;
         err = ERROR(ERR_FILE_READ, "Error while reading file");
+        err.system_code = saved_errno;
         goto cleanup;    
     }
 
@@ -124,6 +125,11 @@ Error Count_lines(FileInfo *self){
     self->file_size = size;    
 
     cleanup:
-       File_close(&fileobject);
+       close_err =  File_close(&fileobject);
+
+       //if reading succeeded but closing failed
+       if (error_is_ok(&err) && !error_is_ok(&close_err)) {
+           err = close_err;       
+       }
        return err;    
 }
