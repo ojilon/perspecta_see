@@ -25,6 +25,7 @@ const char *error_name(ErrorCode code) {
         case ERR_FILE_OPEN:        return "ERR_FILE_OPEN";
         case ERR_FILE_READ:        return "ERR_FILE_READ";
         case ERR_INTERNAL:         return "ERR_INTERNAL";
+        case ERR_FILE_CLOSE:       return "ERR_FILE_CLOSE";
     }
 
     return "ERR_UNKNOWN";

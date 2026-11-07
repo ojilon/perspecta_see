@@ -1,8 +1,9 @@
 #include "error.h"
-#include <stdio.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include "file.h"
 
 #define MAX_PATH_LENGTH 260
 
@@ -82,8 +83,7 @@ Error Unpack_for_file_properties(FileInfo *self, const char *path) {
 //Count the number of lines in the file
 Error Count_lines(FileInfo *self){
     Error err = ERROR_OK;
-    FILE *file = NULL;
-
+    
     int ch;
     int last = '\n'; /*an empty file counts as 0 lines */
     int lines = 0;
@@ -95,22 +95,24 @@ Error Count_lines(FileInfo *self){
         return ERROR(ERR_INVALID_ARGUMENT, "NULL FileInfo");    
     }
 
-    file = fopen(self->file_path, "rb");
-    if (file == NULL) {
+    //get file handle
+    File fileobject;
+    
+    err = File_open(&fileobject, self->file_path, "rb");
+    if (!error_is_ok(&err)) {
         int saved = errno;
-        err = ERROR(ERR_FILE_OPEN, "Coud not open file");
         err.system_code = saved;
         goto cleanup;    
     }
 
     //count the number of lines in the file
-    while ((ch = fgetc(file)) != EOF) {
+    while ((ch = fgetc(fileobject.handle)) != EOF) {
         size++;
         if(ch == '\n') lines++;
         last = ch;    
     }
     
-    if (ferror(file)) {
+    if (ferror(fileobject.handle)) {
         err = ERROR(ERR_FILE_READ, "Error while reading file");
         goto cleanup;    
     }
@@ -122,6 +124,6 @@ Error Count_lines(FileInfo *self){
     self->file_size = size;    
 
     cleanup:
-       if(file != NULL) fclose(file);
+       File_close(&fileobject);
        return err;    
 }
