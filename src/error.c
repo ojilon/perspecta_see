@@ -33,8 +33,7 @@ const char *error_name(ErrorCode code) {
 void error_print(const Error *err){
     fprintf(stderr, "error [%s]: %s (%s:%d)\n", error_name(err->code), err->message, err->file, err->line);
 
-    if (err->system_code == 0) {
+    if (err->system_code != 0) {
         fprintf(stderr, " cause: %s\n", strerror(err->system_code));
-    
     }
 }
