@@ -77,6 +77,8 @@ Error Unpack_for_file_properties(FileInfo *self, const char *path) {
     return ERROR_OK;
 }
 
+
+//Count the number of lines in the file
 Error Count_lines(FileInfo *self){
     Error err = ERROR_OK;
     FILE *file = NULL;
@@ -94,7 +96,9 @@ Error Count_lines(FileInfo *self){
 
     file = fopen(self->file_path, "rb");
     if (file == NULL) {
+        int saved = errno;
         err = ERROR(ERR_FILE_OPEN, "Coud not open file");
+        err.system_code = saved;
         goto cleanup;    
     }
 
