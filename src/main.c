@@ -97,7 +97,7 @@ Error Count_lines(FileInfo *self){
     }
 
     //get file handle
-    File fileobject;
+    File fileobject = {0};
     
     err = File_open(&fileobject, self->file_path, "rb");
     if (!error_is_ok(&err)) {
